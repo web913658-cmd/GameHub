@@ -1,0 +1,33 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- 构建产物 ----
+# PyInstaller 单文件 exe 与中间产物，由 build_exe.bat 现场生成
+dist/
+build/pyi/
+*.spec.bak
+
+# ---- 运行时数据 ----
+# 扫描结果、封面缓存、图标缓存、日志、Edge 窗口 profile
+# 这些是程序运行后生成的，不属于源码
+data/
+*.log
+
+# ---- 开发调试产物 ----
+# 截图、临时测试脚本、浏览器自动化会话
+shots/
+.playwright-cli/
+build/_verify_*.py
+build/_t*.jpg
+build/_duck.bin
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

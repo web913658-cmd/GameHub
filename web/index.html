@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 我的游戏库</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- 侧边栏 -->
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="app-mark">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+        <path d="M7.5 12h3M9 10.5v3M15.2 12.2h.01M17.2 10.4h.01"></path>
+      </svg>
+    </div>
+    <div class="app-name">GameHub</div>
+  </div>
+
+  <nav class="nav" id="platformNav">
+    <button class="nav-item is-active" data-platform="all">
+      <span class="nav-dot" style="background:#007aff"></span>
+      <span class="nav-label">全部游戏</span>
+      <span class="nav-count" id="countAll">0</span>
+    </button>
+    <button class="nav-item" data-platform="favorite">
+      <span class="nav-dot" style="background:#ff9500"></span>
+      <span class="nav-label">我的收藏</span>
+      <span class="nav-count" id="countFav">0</span>
+    </button>
+    <div class="nav-divider"></div>
+    <div class="nav-section">游戏平台</div>
+    <div id="platformList"></div>
+  </nav>
+
+  <div class="sidebar-foot">
+    <button class="btn-primary" id="btnScan">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M20 11a8 8 0 1 0-2.3 5.7"></path><path d="M20 5v6h-6"></path>
+      </svg>
+      <span>重新扫描</span>
+    </button>
+    <button class="btn-ghost" id="btnSettings">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-3-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 3 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
+      </svg>
+      <span>设置</span>
+    </button>
+  </div>
+</aside>
+
+<!-- 主区域 -->
+<main class="main">
+  <header class="toolbar">
+    <div class="toolbar-left">
+      <h1 class="large-title" id="viewTitle">全部游戏</h1>
+      <div class="subtitle" id="viewSubtitle">正在载入…</div>
+    </div>
+    <div class="toolbar-right">
+      <div class="search">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input type="text" id="searchInput" placeholder="搜索游戏" autocomplete="off">
+      </div>
+      <div class="segmented" id="sortSeg">
+        <button class="is-active" data-sort="name">名称</button>
+        <button data-sort="recent">最近</button>
+        <button data-sort="size">体积</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 扫描进度 -->
+  <div class="scanbar" id="scanbar" hidden>
+    <div class="scanbar-track"><div class="scanbar-fill" id="scanFill"></div></div>
+    <div class="scanbar-text" id="scanText">正在扫描…</div>
+  </div>
+
+  <!-- 游戏网格 -->
+  <section class="grid-wrap">
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+          <path d="M7.5 12h3M9 10.5v3M15.2 12.2h.01M17.2 10.4h.01"></path>
+        </svg>
+      </div>
+      <div class="empty-title" id="emptyTitle">还没有游戏</div>
+      <div class="empty-sub" id="emptySub">点击左侧「重新扫描」，自动识别本机已安装的游戏</div>
+    </div>
+  </section>
+</main>
+
+<!-- 启动动画遮罩 -->
+<div class="launch-overlay" id="launchOverlay" hidden>
+  <div class="launch-card">
+    <div class="launch-art" id="launchArt"></div>
+    <div class="launch-info">
+      <div class="launch-name" id="launchName"></div>
+      <div class="launch-status" id="launchStatus">正在启动…</div>
+      <div class="launch-spinner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情面板 -->
+<div class="sheet-mask" id="sheetMask" hidden></div>
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-art" id="sheetArt"></div>
+  <div class="sheet-body">
+    <div class="sheet-title" id="sheetName"></div>
+    <div class="sheet-meta" id="sheetMeta"></div>
+    <div class="sheet-actions">
+      <button class="act act-primary" id="sheetLaunch">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        启动游戏
+      </button>
+      <button class="act" id="sheetFav">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>
+        收藏
+      </button>
+      <button class="act" id="sheetFolder">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        打开目录
+      </button>
+      <button class="act act-danger" id="sheetRemove">从库中移除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 设置面板 -->
+<div class="sheet-mask" id="setMask" hidden></div>
+<div class="panel" id="settingsPanel" hidden>
+  <div class="panel-title">设置</div>
+
+  <div class="field">
+    <span class="field-label">SteamGridDB API Key</span>
+    <div class="input-row">
+      <input type="text" id="sgdbKey" placeholder="粘贴你的 API Key" autocomplete="off" spellcheck="false">
+      <button class="act act-mini" id="btnTestSgdb">测试连接</button>
+    </div>
+    <span class="field-hint" id="sgdbHint">
+      在 steamgriddb.com → 个人设置里免费申请。这是专门给「非 Steam 游戏」提供封面的社区图库，
+      填上之后 Epic / 本地 / 独立游戏也能拿到正规海报，而且不依赖 Steam 商店接口。
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">离线游戏名库</span>
+    <div class="input-row">
+      <span class="field-hint" id="applistHint" style="margin:0;flex:1">检查中…</span>
+      <button class="act act-mini" id="btnApplist">下载 / 更新</button>
+    </div>
+    <span class="field-hint">
+      Steam 全量应用名称表（约 2 MB）。下载后即使商店接口不可用，
+      也能离线把游戏名解析成 appid 来取官方海报。
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">扫描独立游戏</span>
+    <span class="switch"><input type="checkbox" id="standaloneChk" checked><i></i></span>
+    <span class="field-hint">从开始菜单与常见目录识别未通过平台安装的独立游戏</span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">扫描本地游戏</span>
+    <span class="switch"><input type="checkbox" id="localChk" checked><i></i></span>
+    <span class="field-hint">识别离线安装 / 免安装 / 绿色版游戏：通过引擎特征（Unity、Unreal、Godot…）与本地安装标记判断，只读取文件名，不做任何修改</span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">自定义扫描目录</span>
+    <textarea id="localRoots" rows="3" placeholder="每行一个目录，例如：&#10;D:\Games&#10;E:\免安装游戏"></textarea>
+    <span class="field-hint">除了自动扫描各磁盘根目录外，额外扫描这些位置</span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">开机自启动</span>
+    <span class="switch"><input type="checkbox" id="autostartChk"><i></i></span>
+    <span class="field-hint" id="autostartHint">
+      开机后自动运行并驻留系统托盘（不弹窗口）。写入注册表
+      HKCU\...\CurrentVersion\Run，可随时在此关闭。
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">程序运行方式</span>
+    <span class="field-hint" style="margin:0">
+      关闭应用窗口 = 缩到系统托盘，程序继续后台运行；
+      在任务栏右下角（显示隐藏的图标）左键点击 GameHub 图标，
+      可再次打开窗口或完全退出。
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="field-label">完全退出</span>
+    <div class="input-row">
+      <span class="field-hint" style="margin:0;flex:1">结束进程、移除托盘图标并停止服务</span>
+      <button class="act act-mini act-danger" id="btnExit">退出程序</button>
+    </div>
+  </div>
+
+  <div class="panel-actions">
+    <button class="act" id="setCancel">取消</button>
+    <button class="act act-primary" id="setSave">保存</button>
+  </div>
+</div>
+
+<!-- 轻提示 -->
+<div class="toast" id="toast" hidden></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
